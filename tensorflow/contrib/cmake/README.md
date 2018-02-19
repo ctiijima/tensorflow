@@ -26,23 +26,28 @@ The CMake files in this directory can build the core TensorFlow runtime, an
 example C++ binary, and a PIP package containing the runtime and Python
 bindings.
 
-### Pre-requisites
+### Prerequisites
 
-* CMake version 3.5 or later.
+* [CMake](https://cmake.org/download/) version 3.5 or later.
 
 * [Git](https://git-scm.com)
 
 * [SWIG](http://www.swig.org/download.html)
 
-* Additional pre-requisites for Microsoft Windows:
+* Additional prerequisites for Microsoft Windows:
   - Visual Studio 2015
   - Python 3.5
-  - NumPy 1.11.0 or later
 
 * Additional pre-requisites for Linux:
   - Python 2.7 or later
   - [Docker](https://www.docker.com/) (for automated testing)
+
+* Additional prerequisites for macOS:
+  -Python 2.7 or later
+
+* Additional Python Dependencies:
   - NumPy 1.11.0 or later
+  - wheel  
 
 ### Known-good configurations
 
@@ -60,7 +65,7 @@ bindings.
   - Docker 1.9.1 (for automated testing)
 
 ### Current known limitations
-  - The Python package supports **Python 3.5 only**, because that is the only
+  - The Python package supports **Python 3.5 only** on Windows, because that is the only
     version for which standard Python binaries exist and those binaries are
     compatible with the TensorFlow runtime. (On Windows, the standard Python
     binaries for versions earlier than 3.5 were compiled with older compilers
