@@ -38,7 +38,7 @@ bindings.
   - Visual Studio 2015
   - Python 3.5
 
-* Additional pre-requisites for Linux:
+* Additional prerequisites for Linux:
   - Python 2.7 or later
   - [Docker](https://www.docker.com/) (for automated testing)
 
