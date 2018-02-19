@@ -22,7 +22,6 @@ import six
 
 from tensorflow.python.estimator import estimator
 from tensorflow.python.estimator import model_fn
-from tensorflow.python.estimator import warm_starting_util
 from tensorflow.python.estimator.canned import head as head_lib
 from tensorflow.python.estimator.canned import optimizers
 from tensorflow.python.feature_column import feature_column as feature_column_lib
@@ -34,6 +33,7 @@ from tensorflow.python.ops import variable_scope
 from tensorflow.python.ops.losses import losses
 from tensorflow.python.summary import summary
 from tensorflow.python.training import training_util
+from tensorflow.python.util.tf_export import tf_export
 
 # The default learning rate of 0.05 is a historical artifact of the initial
 # implementation, but seems a reasonable choice.
@@ -150,9 +150,7 @@ def _dnn_model_fn(features,
     config: `RunConfig` object to configure the runtime settings.
 
   Returns:
-    predictions: A dict of `Tensor` objects.
-    loss: A scalar containing the loss of the step.
-    train_op: The op for training.
+    An `EstimatorSpec` instance.
 
   Raises:
     ValueError: If features has the wrong type.
@@ -199,6 +197,7 @@ def _dnn_model_fn(features,
         logits=logits)
 
 
+@tf_export('estimator.DNNClassifier')
 class DNNClassifier(estimator.Estimator):
   """A classifier for TensorFlow DNN models.
 
@@ -340,8 +339,8 @@ class DNNClassifier(estimator.Estimator):
           loss_reduction=loss_reduction)
 
     def _model_fn(features, labels, mode, config):
-      """Call the defined shared _dnn_model_fn and possibly warm-start."""
-      estimator_spec = _dnn_model_fn(
+      """Call the defined shared _dnn_model_fn."""
+      return _dnn_model_fn(
           features=features,
           labels=labels,
           mode=mode,
@@ -353,19 +352,13 @@ class DNNClassifier(estimator.Estimator):
           dropout=dropout,
           input_layer_partitioner=input_layer_partitioner,
           config=config)
-      # pylint: disable=protected-access
-      warm_start_settings = warm_starting_util._get_default_warm_start_settings(
-          warm_start_from)
-      if warm_start_settings:
-        warm_starting_util._warm_start(warm_start_settings)
-      # pylint: enable=protected-access
-
-      return estimator_spec
 
     super(DNNClassifier, self).__init__(
-        model_fn=_model_fn, model_dir=model_dir, config=config)
+        model_fn=_model_fn, model_dir=model_dir, config=config,
+        warm_start_from=warm_start_from)
 
 
+@tf_export('estimator.DNNRegressor')
 class DNNRegressor(estimator.Estimator):
   """A regressor for TensorFlow DNN models.
 
@@ -490,8 +483,8 @@ class DNNRegressor(estimator.Estimator):
     """
 
     def _model_fn(features, labels, mode, config):
-      """Call the defined shared _dnn_model_fn and possibly warm-start."""
-      estimator_spec = _dnn_model_fn(
+      """Call the defined shared _dnn_model_fn."""
+      return _dnn_model_fn(
           features=features,
           labels=labels,
           mode=mode,
@@ -506,14 +499,7 @@ class DNNRegressor(estimator.Estimator):
           dropout=dropout,
           input_layer_partitioner=input_layer_partitioner,
           config=config)
-      # pylint: disable=protected-access
-      warm_start_settings = warm_starting_util._get_default_warm_start_settings(
-          warm_start_from)
-      if warm_start_settings:
-        warm_starting_util._warm_start(warm_start_settings)
-      # pylint: enable=protected-access
-
-      return estimator_spec
 
     super(DNNRegressor, self).__init__(
-        model_fn=_model_fn, model_dir=model_dir, config=config)
+        model_fn=_model_fn, model_dir=model_dir, config=config,
+        warm_start_from=warm_start_from)

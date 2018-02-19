@@ -23,7 +23,6 @@ import math
 import six
 
 from tensorflow.python.estimator import estimator
-from tensorflow.python.estimator import warm_starting_util
 from tensorflow.python.estimator.canned import head as head_lib
 from tensorflow.python.estimator.canned import optimizers
 from tensorflow.python.feature_column import feature_column as feature_column_lib
@@ -35,6 +34,7 @@ from tensorflow.python.ops.losses import losses
 from tensorflow.python.summary import summary
 from tensorflow.python.training import ftrl
 from tensorflow.python.training import training_util
+from tensorflow.python.util.tf_export import tf_export
 
 
 # The default learning rate of 0.2 is a historical artifact of the initial
@@ -171,6 +171,7 @@ def _linear_model_fn(features, labels, mode, head, feature_columns, optimizer,
         logits=logits)
 
 
+@tf_export('estimator.LinearClassifier')
 class LinearClassifier(estimator.Estimator):
   """Linear classifier model.
 
@@ -305,8 +306,8 @@ class LinearClassifier(estimator.Estimator):
           loss_reduction=loss_reduction)
 
     def _model_fn(features, labels, mode, config):
-      """Call the defined shared _linear_model_fn and possibly warm-start."""
-      estimator_spec = _linear_model_fn(
+      """Call the defined shared _linear_model_fn."""
+      return _linear_model_fn(
           features=features,
           labels=labels,
           mode=mode,
@@ -315,21 +316,15 @@ class LinearClassifier(estimator.Estimator):
           optimizer=optimizer,
           partitioner=partitioner,
           config=config)
-      # pylint: disable=protected-access
-      warm_start_settings = warm_starting_util._get_default_warm_start_settings(
-          warm_start_from)
-      if warm_start_settings:
-        warm_starting_util._warm_start(warm_start_settings)
-      # pylint: enable=protected-access
-
-      return estimator_spec
 
     super(LinearClassifier, self).__init__(
         model_fn=_model_fn,
         model_dir=model_dir,
-        config=config)
+        config=config,
+        warm_start_from=warm_start_from)
 
 
+@tf_export('estimator.LinearRegressor')
 class LinearRegressor(estimator.Estimator):
   """An estimator for TensorFlow Linear regression problems.
 
@@ -432,8 +427,8 @@ class LinearRegressor(estimator.Estimator):
         loss_reduction=loss_reduction)
 
     def _model_fn(features, labels, mode, config):
-      """Call the defined shared _linear_model_fn and possibly warm-start."""
-      estimator_spec = _linear_model_fn(
+      """Call the defined shared _linear_model_fn."""
+      return _linear_model_fn(
           features=features,
           labels=labels,
           mode=mode,
@@ -442,16 +437,9 @@ class LinearRegressor(estimator.Estimator):
           optimizer=optimizer,
           partitioner=partitioner,
           config=config)
-      # pylint: disable=protected-access
-      warm_start_settings = warm_starting_util._get_default_warm_start_settings(
-          warm_start_from)
-      if warm_start_settings:
-        warm_starting_util._warm_start(warm_start_settings)
-      # pylint: enable=protected-access
-
-      return estimator_spec
 
     super(LinearRegressor, self).__init__(
         model_fn=_model_fn,
         model_dir=model_dir,
-        config=config)
+        config=config,
+        warm_start_from=warm_start_from)
