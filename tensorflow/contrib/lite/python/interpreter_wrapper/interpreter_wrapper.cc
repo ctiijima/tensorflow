@@ -42,6 +42,8 @@ std::unique_ptr<tflite::Interpreter> CreateInterpreter(
     return nullptr;
   }
 
+  tensorflow::ImportNumpy();
+
   std::unique_ptr<tflite::Interpreter> interpreter;
   tflite::InterpreterBuilder(*model, resolver)(&interpreter);
   if (interpreter) {
@@ -66,6 +68,8 @@ int TfLiteTypeToPyArrayType(TfLiteType tf_lite_type) {
       return NPY_FLOAT32;
     case kTfLiteInt32:
       return NPY_INT32;
+    case kTfLiteInt16:
+      return NPY_INT16;
     case kTfLiteUInt8:
       return NPY_UINT8;
     case kTfLiteInt64:
@@ -88,6 +92,8 @@ TfLiteType TfLiteTypeFromPyArray(PyArrayObject* array) {
       return kTfLiteFloat32;
     case NPY_INT32:
       return kTfLiteInt32;
+    case NPY_INT16:
+      return kTfLiteInt16;
     case NPY_UINT8:
       return kTfLiteUInt8;
     case NPY_INT64:
@@ -331,9 +337,14 @@ InterpreterWrapper* InterpreterWrapper::CreateWrapperCPPFromFile(
 }
 
 InterpreterWrapper* InterpreterWrapper::CreateWrapperCPPFromBuffer(
-    const char* data, size_t len) {
+    PyObject* data) {
+  char * buf = nullptr;
+  Py_ssize_t length;
+  if (PY_TO_CPPSTRING(data, &buf, &length) == -1) {
+    return nullptr;
+  }
   std::unique_ptr<tflite::FlatBufferModel> model =
-      tflite::FlatBufferModel::BuildFromBuffer(data, len);
+      tflite::FlatBufferModel::BuildFromBuffer(buf, length);
   return model ? new InterpreterWrapper(std::move(model)) : nullptr;
 }
 

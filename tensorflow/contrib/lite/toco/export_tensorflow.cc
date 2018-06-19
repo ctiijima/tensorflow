@@ -494,7 +494,7 @@ void ConvertTransposeConvOperator(const Model& model,
   const auto& weights_array = model.GetArray(weights_array_name);
   CHECK(weights_array.buffer->type == ArrayDataType::kFloat);
   ConvertFloatTensorConst(model, weights_array_name, AxesOrder::kOHWI,
-                          AxesOrder::kHWIO, tensorflow_graph);
+                          AxesOrder::kHWOI, tensorflow_graph);
   auto& strides = (*conv2d_op->mutable_attr())["strides"];
   strides.mutable_list()->add_i(1);
   strides.mutable_list()->add_i(src_op.stride_height);
@@ -1687,6 +1687,22 @@ void ConvertSelectOperator(const Model& model, const SelectOperator& src_op,
   (*sub_op->mutable_attr())["T"].set_type(data_type);
 }
 
+void ConvertTileOperator(const Model& model,
+                         const TensorFlowTileOperator& src_op,
+                         GraphDef* tensorflow_graph) {
+  auto* tile_op = tensorflow_graph->add_node();
+  tile_op->set_op("Tile");
+  tile_op->set_name(src_op.outputs[0]);
+  CHECK_EQ(src_op.inputs.size(), 2);
+  *tile_op->add_input() = src_op.inputs[0];
+  *tile_op->add_input() = src_op.inputs[1];
+  const auto data_type = GetTensorFlowDataType(model, src_op.inputs[0]);
+  (*tile_op->mutable_attr())["T"].set_type(data_type);
+  const auto multiples_data_type =
+      GetTensorFlowDataType(model, src_op.inputs[1]);
+  (*tile_op->mutable_attr())["Tmultiples"].set_type(multiples_data_type);
+}
+
 void ConvertTopKV2Operator(const Model& model, const TopKV2Operator& src_op,
                            GraphDef* tensorflow_graph) {
   auto* topk_op = tensorflow_graph->add_node();
@@ -1726,6 +1742,25 @@ void ConvertComparisonOperator(const Model& model, const Operator& src_op,
   *comparison_op->add_input() = src_op.inputs[1];
   const auto data_type = GetTensorFlowDataType(model, src_op.inputs[0]);
   (*comparison_op->mutable_attr())["T"].set_type(data_type);
+}
+
+void ConvertSparseToDenseOperator(const Model& model,
+                                  const SparseToDenseOperator& src_op,
+                                  const char* op_name,
+                                  GraphDef* tensorflow_graph) {
+  auto* sparse_to_dense_op = tensorflow_graph->add_node();
+  sparse_to_dense_op->set_op(op_name);
+  sparse_to_dense_op->set_name(src_op.outputs[0]);
+  CHECK_EQ(src_op.inputs.size(), 4);
+  for (int i = 0; i < 4; ++i) {
+    *sparse_to_dense_op->add_input() = src_op.inputs[i];
+  }
+  const auto data_type = GetTensorFlowDataType(model, src_op.inputs[3]);
+  (*sparse_to_dense_op->mutable_attr())["T"].set_type(data_type);
+  const auto index_type = GetTensorFlowDataType(model, src_op.inputs[0]);
+  (*sparse_to_dense_op->mutable_attr())["Tindices"].set_type(index_type);
+  (*sparse_to_dense_op->mutable_attr())["Tindices"].set_b(
+      src_op.validate_indices);
 }
 
 void ConvertOperator(const Model& model, const Operator& src_op,
@@ -1919,6 +1954,10 @@ void ConvertOperator(const Model& model, const Operator& src_op,
     ConvertRandomUniformOperator(
         model, static_cast<const RandomUniformOperator&>(src_op),
         tensorflow_graph);
+  } else if (src_op.type == OperatorType::kTensorFlowEqual) {
+    ConvertComparisonOperator(model, src_op, "Equal", tensorflow_graph);
+  } else if (src_op.type == OperatorType::kTensorFlowNotEqual) {
+    ConvertComparisonOperator(model, src_op, "NotEqual", tensorflow_graph);
   } else if (src_op.type == OperatorType::kTensorFlowGreater) {
     ConvertComparisonOperator(model, src_op, "Greater", tensorflow_graph);
   } else if (src_op.type == OperatorType::kTensorFlowGreaterEqual) {
@@ -1930,6 +1969,10 @@ void ConvertOperator(const Model& model, const Operator& src_op,
   } else if (src_op.type == OperatorType::kSelect) {
     ConvertSelectOperator(model, static_cast<const SelectOperator&>(src_op),
                           tensorflow_graph);
+  } else if (src_op.type == OperatorType::kTensorFlowTile) {
+    ConvertTileOperator(model,
+                        static_cast<const TensorFlowTileOperator&>(src_op),
+                        tensorflow_graph);
   } else {
     LOG(FATAL) << "Unhandled operator type " << OperatorTypeName(src_op.type);
   }

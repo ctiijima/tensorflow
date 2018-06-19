@@ -50,31 +50,31 @@ def tf_workspace(path_prefix="", tf_repo_name=""):
   mkl_repository(
       name = "mkl_linux",
       urls = [
-          "https://mirror.bazel.build/github.com/intel/mkl-dnn/releases/download/v0.13/mklml_lnx_2018.0.2.20180127.tgz",
-          "https://github.com/intel/mkl-dnn/releases/download/v0.13/mklml_lnx_2018.0.2.20180127.tgz",
+          "https://mirror.bazel.build/github.com/intel/mkl-dnn/releases/download/v0.14/mklml_lnx_2018.0.3.20180406.tgz",
+          "https://github.com/intel/mkl-dnn/releases/download/v0.14/mklml_lnx_2018.0.3.20180406.tgz"
       ],
-      sha256 = "74844bd77294742bf2396ff040369d1aa4cdd9e826fcd38cf8398ae83564d146",
-      strip_prefix = "mklml_lnx_2018.0.2.20180127",
+      sha256 = "d2305244fdc9b87db7426ed4496e87a4b3977ad3374d73b8000e8b7a5b7aa725",
+      strip_prefix = "mklml_lnx_2018.0.3.20180406",
       build_file = clean_dep("//third_party/mkl:mkl.BUILD")
   )
   mkl_repository(
       name = "mkl_windows",
       urls = [
-          "https://mirror.bazel.build/github.com/intel/mkl-dnn/releases/download/v0.13/mklml_win_2018.0.2.20180127.zip",
-          "https://github.com/intel/mkl-dnn/releases/download/v0.13/mklml_win_2018.0.2.20180127.zip"
+          "https://mirror.bazel.build/github.com/intel/mkl-dnn/releases/download/v0.14/mklml_win_2018.0.3.20180406.zip",
+          "https://github.com/intel/mkl-dnn/releases/download/v0.14/mklml_win_2018.0.3.20180406.zip"
       ],
-      sha256 = "d8fbf0faa0684bffa3548005d05fe5cfe56ff9dbc0e15e7612d7ac01055a6ded",
-      strip_prefix = "mklml_win_2018.0.2.20180127",
+      sha256 = "a584a5bf1c8d2ad70b90d12b52652030e9a338217719064fdb84b7ad0d693694",
+      strip_prefix = "mklml_win_2018.0.3.20180406",
       build_file = clean_dep("//third_party/mkl:mkl.BUILD")
   )
   mkl_repository(
       name = "mkl_darwin",
       urls = [
-          "https://mirror.bazel.build/github.com/intel/mkl-dnn/releases/download/v0.13/mklml_mac_2018.0.2.20180127.tgz",
-          "https://github.com/intel/mkl-dnn/releases/download/v0.13/mklml_mac_2018.0.2.20180127.tgz"
+          "https://mirror.bazel.build/github.com/intel/mkl-dnn/releases/download/v0.14/mklml_mac_2018.0.3.20180406.tgz",
+          "https://github.com/intel/mkl-dnn/releases/download/v0.14/mklml_mac_2018.0.3.20180406.tgz"
       ],
-      sha256 = "aa740d71e14562bfea56e6829e6dc186e7487cbcf6748a88dec73826b7ec1943",
-      strip_prefix = "mklml_mac_2018.0.2.20180127",
+      sha256 = "094e3dfd61c816136dc8d12a45cc611ce26c5f4828176a3644cd0b0efa15a25b",
+      strip_prefix = "mklml_mac_2018.0.3.20180406",
       build_file = clean_dep("//third_party/mkl:mkl.BUILD")
   )
 
@@ -85,11 +85,11 @@ def tf_workspace(path_prefix="", tf_repo_name=""):
   tf_http_archive(
       name = "mkl_dnn",
       urls = [
-          "https://mirror.bazel.build/github.com/intel/mkl-dnn/archive/v0.13.tar.gz",
-          "https://github.com/intel/mkl-dnn/archive/v0.13.tar.gz",
+          "https://mirror.bazel.build/github.com/intel/mkl-dnn/archive/v0.14.tar.gz",
+          "https://github.com/intel/mkl-dnn/archive/v0.14.tar.gz",
       ],
-      sha256 = "d2cfd93a70cfe86ebe054477c530c9b5c1218b70f75856eb6d1956c68ee89e8f",
-      strip_prefix = "mkl-dnn-0.13",
+      sha256 = "efebc53882856afec86457a2da644693f5d59c68772d41d640d6b60a8efc4eb0",
+      strip_prefix = "mkl-dnn-0.14",
       build_file = clean_dep("//third_party/mkl_dnn:mkldnn.BUILD"),
   )
 
@@ -107,13 +107,12 @@ def tf_workspace(path_prefix="", tf_repo_name=""):
   tf_http_archive(
       name = "eigen_archive",
       urls = [
-          "https://mirror.bazel.build/bitbucket.org/eigen/eigen/get/6913f0cf7d06.tar.gz",
-          "https://bitbucket.org/eigen/eigen/get/6913f0cf7d06.tar.gz",
+          "https://mirror.bazel.build/bitbucket.org/eigen/eigen/get/267806ed9b4f.tar.gz",
+          "https://bitbucket.org/eigen/eigen/get/267806ed9b4f.tar.gz",
       ],
-      sha256 = "791b836cacd03e20bae5bdd25f1c4a5505a0a9975ba94a61eb4e2631fbd1d53a",
-      strip_prefix = "eigen-eigen-6913f0cf7d06",
+      sha256 = "ade57357093463cab9e4e51cd5749c81483a75451b1471a3ebc73f9c1d14043b",
+      strip_prefix = "eigen-eigen-267806ed9b4f",
       build_file = clean_dep("//third_party:eigen.BUILD"),
-      patch_file = clean_dep("//third_party:eigen_fix_cuda_compilation.patch")
   )
 
   tf_http_archive(
@@ -167,8 +166,7 @@ def tf_workspace(path_prefix="", tf_repo_name=""):
   tf_http_archive(
       name = "gemmlowp",
       urls = [
-          # TODO (yongtang): uncomment once mirror.bazel.build is propagated.
-          # "https://mirror.bazel.build/github.com/google/gemmlowp/archive/38ebac7b059e84692f53e5938f97a9943c120d98.zip",
+          "https://mirror.bazel.build/github.com/google/gemmlowp/archive/38ebac7b059e84692f53e5938f97a9943c120d98.zip",
           "https://github.com/google/gemmlowp/archive/38ebac7b059e84692f53e5938f97a9943c120d98.zip",
       ],
       sha256 = "b87faa7294dfcc5d678f22a59d2c01ca94ea1e2a3b488c38a95a67889ed0a658",
@@ -189,11 +187,11 @@ def tf_workspace(path_prefix="", tf_repo_name=""):
   tf_http_archive(
       name = "highwayhash",
       urls = [
-          "https://mirror.bazel.build/github.com/google/highwayhash/archive/dfcb97ca4fe9277bf9dc1802dd979b071896453b.tar.gz",
-          "https://github.com/google/highwayhash/archive/dfcb97ca4fe9277bf9dc1802dd979b071896453b.tar.gz",
+          "http://mirror.bazel.build/github.com/google/highwayhash/archive/fd3d9af80465e4383162e4a7c5e2f406e82dd968.tar.gz",
+          "https://github.com/google/highwayhash/archive/fd3d9af80465e4383162e4a7c5e2f406e82dd968.tar.gz",
       ],
-      sha256 = "0f30a15b1566d93f146c8d149878a06e91d9bb7ec2cfd76906df62a82be4aac9",
-      strip_prefix = "highwayhash-dfcb97ca4fe9277bf9dc1802dd979b071896453b",
+      sha256 = "9c3e0e87d581feeb0c18d814d98f170ff23e62967a2bd6855847f0b2fe598a37",
+      strip_prefix = "highwayhash-fd3d9af80465e4383162e4a7c5e2f406e82dd968",
       build_file = clean_dep("//third_party:highwayhash.BUILD"),
   )
 
@@ -202,6 +200,7 @@ def tf_workspace(path_prefix="", tf_repo_name=""):
       urls = [
           "https://mirror.bazel.build/www.nasm.us/pub/nasm/releasebuilds/2.12.02/nasm-2.12.02.tar.bz2",
           "http://pkgs.fedoraproject.org/repo/pkgs/nasm/nasm-2.12.02.tar.bz2/d15843c3fb7db39af80571ee27ec6fad/nasm-2.12.02.tar.bz2",
+          "http://www.nasm.us/pub/nasm/releasebuilds/2.12.02/nasm-2.12.02.tar.bz2",
       ],
       sha256 = "00b0891c678c065446ca59bcee64719d0096d54d6886e6e472aeee2e170ae324",
       strip_prefix = "nasm-2.12.02",
@@ -317,7 +316,7 @@ def tf_workspace(path_prefix="", tf_repo_name=""):
       strip_prefix = "backports.weakref-1.0rc1/src",
       build_file = clean_dep("//third_party:backports_weakref.BUILD"),
   )
-  
+
   filegroup_external(
       name = "org_python_license",
       licenses = ["notice"],  # Python 2.0
@@ -453,11 +452,11 @@ def tf_workspace(path_prefix="", tf_repo_name=""):
   tf_http_archive(
       name = "llvm",
       urls = [
-          "https://mirror.bazel.build/github.com/llvm-mirror/llvm/archive/7b8a8728fbd27086efbf3c57cf2bb35a557108c9.tar.gz",
-          "https://github.com/llvm-mirror/llvm/archive/7b8a8728fbd27086efbf3c57cf2bb35a557108c9.tar.gz",
+          "https://mirror.bazel.build/github.com/llvm-mirror/llvm/archive/45a02a4f8474b4b8c5cc106b5cecb06cf6e1b3c6.tar.gz",
+          "https://github.com/llvm-mirror/llvm/archive/45a02a4f8474b4b8c5cc106b5cecb06cf6e1b3c6.tar.gz",
       ],
-      sha256 = "c620859c3ae5818f316de4837f340b3bba1646f8add0a28e6d4da34ce47e3969",
-      strip_prefix = "llvm-7b8a8728fbd27086efbf3c57cf2bb35a557108c9",
+      sha256 = "056f7316a354d1f95e013176bd9b8be74e8f4d47fb0d908e0e742613187dbd59",
+      strip_prefix = "llvm-45a02a4f8474b4b8c5cc106b5cecb06cf6e1b3c6",
       build_file = clean_dep("//third_party/llvm:llvm.BUILD"),
   )
 
@@ -629,6 +628,16 @@ def tf_workspace(path_prefix="", tf_repo_name=""):
       licenses = ["notice"],  # Apache 2.0
   )
 
+  java_import_external(
+      name = "com_squareup_javapoet",
+      jar_sha256 = "5bb5abdfe4366c15c0da3332c57d484e238bd48260d6f9d6acf2b08fdde1efea",
+      jar_urls = [
+          "http://mirror.bazel.build/repo1.maven.org/maven2/com/squareup/javapoet/1.9.0/javapoet-1.9.0.jar",
+          "http://repo1.maven.org/maven2/com/squareup/javapoet/1.9.0/javapoet-1.9.0.jar",
+      ],
+      licenses = ["notice"],  # Apache 2.0
+  )
+
   tf_http_archive(
       name = "com_google_pprof",
       urls = [
@@ -780,10 +789,13 @@ def tf_workspace(path_prefix="", tf_repo_name=""):
       actual = "@grpc//:grpc_python_plugin",
   )
 
-  # gRPC has three empty C++ functions which it wants the user to define
-  # at build time. https://github.com/grpc/grpc/issues/13590
   native.bind(
       name = "grpc_lib",
+      actual = "@grpc//:grpc++",
+  )
+
+  native.bind(
+      name = "grpc_lib_unsecure",
       actual = "@grpc//:grpc++_unsecure",
   )
 
@@ -821,7 +833,7 @@ def tf_workspace(path_prefix="", tf_repo_name=""):
   # Needed by Protobuf
   native.bind(
       name = "python_headers",
-      actual = clean_dep("//util/python:python_headers"),
+      actual = clean_dep("//third_party/python_runtime:headers"),
   )
 
   # Needed by Protobuf

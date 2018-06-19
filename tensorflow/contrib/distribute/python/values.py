@@ -35,10 +35,10 @@ from tensorflow.python.framework import ops
 from tensorflow.python.ops import array_ops
 from tensorflow.python.ops import control_flow_ops
 from tensorflow.python.ops import math_ops
-from tensorflow.python.training import checkpointable
 from tensorflow.python.training import device_util
 from tensorflow.python.training import distribute as distribute_lib
 from tensorflow.python.training import saver
+from tensorflow.python.training.checkpointable import base as checkpointable
 from tensorflow.python.util import nest
 
 
@@ -65,9 +65,10 @@ class DistributedValues(object):
     device = device_util.canonicalize(device)
     try:
       return self._index[device]
-    except KeyError:
-      raise ValueError("Device %s not found in %s (current device %s)" %
-                       (device, self._index.keys(), device_util.current()))
+    except KeyError as e:
+      six.raise_from(
+          ValueError("Device %s not found in %s (current device %s)" %
+                     (device, self._index.keys(), device_util.current())), e)
 
   def on_device(self, device):
     device = device_util.canonicalize(device)
@@ -237,17 +238,6 @@ class DistributedVariable(DistributedDelegate):
     pass
 
 
-# Register a conversion function which reads the value of the variable,
-# allowing instances of the class to be used as tensors.
-def _tensor_conversion(var, dtype=None, name=None, as_ref=False):
-  # Try to avoid assignments to and other mutations of MirroredVariable
-  # state except through a DistributionStrategy.update() call.
-  assert not as_ref
-  return ops.internal_convert_to_tensor(
-      var.get(), dtype=dtype, name=name, as_ref=as_ref)
-
-
-ops.register_tensor_conversion_function(DistributedVariable, _tensor_conversion)
 ops.register_dense_tensor_like_type(DistributedVariable)
 
 
@@ -341,6 +331,20 @@ class MirroredVariable(DistributedVariable, Mirrored,
     return {checkpointable.VARIABLE_VALUE_KEY: _saveable_factory}
 
 
+# Register a conversion function which reads the value of the variable,
+# allowing instances of the class to be used as tensors.
+def _tensor_conversion_mirrored(var, dtype=None, name=None, as_ref=False):
+  # Try to avoid assignments to and other mutations of MirroredVariable
+  # state except through a DistributionStrategy.update() call.
+  assert not as_ref
+  return ops.internal_convert_to_tensor(
+      var.get(), dtype=dtype, name=name, as_ref=as_ref)
+
+
+ops.register_tensor_conversion_function(MirroredVariable,
+                                        _tensor_conversion_mirrored)
+
+
 class _TowerLocalSaveable(saver.BaseSaverBuilder.SaveableObject):
   """Class for defining how to restore a TowerLocalVariable."""
 
@@ -428,6 +432,17 @@ class TowerLocalVariable(DistributedVariable, PerDevice,
     def _saveable_factory(name=self._common_name):
       return _TowerLocalSaveable(self, name)
     return {checkpointable.VARIABLE_VALUE_KEY: _saveable_factory}
+
+
+# Register a conversion function for TowerLocalVariable which allows as_ref to
+# be true.
+def _tensor_conversion_tower_local(var, dtype=None, name=None, as_ref=False):
+  return ops.internal_convert_to_tensor(
+      var.get(), dtype=dtype, name=name, as_ref=as_ref)
+
+
+ops.register_tensor_conversion_function(TowerLocalVariable,
+                                        _tensor_conversion_tower_local)
 
 
 def _devices_match(d1, d2):
